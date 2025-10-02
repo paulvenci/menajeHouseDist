@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid class="bg-blue-grey-darken-4 pa-4" style="min-height: 100vh;">
+    <v-container fluid class="pa-4" style="min-height: 100vh;">
         <!-- Debug Information (only show if there's an issue) -->
         <v-row v-if="error || ventasStore.ventas.length === 0">
             <v-col cols="12">
@@ -10,9 +10,9 @@
                     text="No se encontraron ventas en la base de datos. Verifica que existan registros de ventas."></v-alert>
 
                 <!-- Debug Card -->
-                <v-card class="bg-blue-grey-darken-3 mb-4" elevation="2">
-                    <v-card-title class="text-white">Información de Debug</v-card-title>
-                    <v-card-text class="text-white">
+                <v-card class="mb-4" elevation="2">
+                    <v-card-title>Información de Debug</v-card-title>
+                    <v-card-text>
                         <div>Estado de carga iniciado: {{ debugInfo.loadingStarted ? '✅' : '❌' }}</div>
                         <div>Estado de carga completado: {{ debugInfo.loadingCompleted ? '✅' : '❌' }}</div>
                         <div>Error ocurrido: {{ debugInfo.errorOccurred ? '❌' : '✅' }}</div>
@@ -25,11 +25,11 @@
 
         <v-row>
             <v-col cols="12">
-                <v-card class="bg-blue-grey-darken-4 mb-4" elevation="2">
-                    <v-card-title class="text-h4 text-white text-center">
+                <v-card class="mb-4" elevation="2">
+                    <v-card-title class="text-h4 text-center">
                         Estadística de Compra Cargada
                     </v-card-title>
-                    <v-card-subtitle class="text-center text-blue-grey-lighten-2">
+                    <v-card-subtitle class="text-center">
                         Totales ({{ ventasStore.ventas.length }} registros)
                     </v-card-subtitle>
                 </v-card>
@@ -39,45 +39,45 @@
         <!-- Statistics Cards -->
         <v-row class="mb-4">
             <v-col cols="12" sm="6" md="3">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
+                <v-card elevation="2">
                     <v-card-item>
-                        <v-card-title class="text-white">Total Compras</v-card-title>
-                        <v-card-subtitle class="text-blue-grey-lighten-2">Cantidad total de compras</v-card-subtitle>
+                        <v-card-title>Total Compras</v-card-title>
+                        <v-card-subtitle>Cantidad total de compras</v-card-subtitle>
                     </v-card-item>
-                    <v-card-text class="text-h4 text-white">
+                    <v-card-text class="text-h4">
                         {{ stats.totalCompras }}
                     </v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
+                <v-card elevation="2">
                     <v-card-item>
-                        <v-card-title class="text-white">Monto Total Gastado</v-card-title>
-                        <v-card-subtitle class="text-blue-grey-lighten-2">Suma de todos los montos</v-card-subtitle>
+                        <v-card-title>Monto Total Gastado</v-card-title>
+                        <v-card-subtitle>Suma de todos los montos</v-card-subtitle>
                     </v-card-item>
-                    <v-card-text class="text-h4 text-white">
+                    <v-card-text class="text-h4">
                         ${{ stats.montoTotal.toLocaleString('es-CL') }}
                     </v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
+                <v-card elevation="2">
                     <v-card-item>
-                        <v-card-title class="text-white">Promedio por Compra</v-card-title>
-                        <v-card-subtitle class="text-blue-grey-lighten-2">Monto promedio</v-card-subtitle>
+                        <v-card-title>Promedio por Compra</v-card-title>
+                        <v-card-subtitle>Monto promedio</v-card-subtitle>
                     </v-card-item>
-                    <v-card-text class="text-h4 text-white">
+                    <v-card-text class="text-h4">
                         ${{ stats.promedioCompra.toLocaleString('es-CL') }}
                     </v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
+                <v-card elevation="2">
                     <v-card-item>
-                        <v-card-title class="text-white">N° Cliente</v-card-title>
-                        <v-card-subtitle class="text-blue-grey-lighten-2">Cantidad de clientes únicos</v-card-subtitle>
+                        <v-card-title>N° Cliente</v-card-title>
+                        <v-card-subtitle>Cantidad de clientes únicos</v-card-subtitle>
                     </v-card-item>
-                    <v-card-text class="text-h4 text-white">
+                    <v-card-text class="text-h4">
                         {{ stats.numeroClientes }}
                     </v-card-text>
                 </v-card>
@@ -87,10 +87,10 @@
         <!-- Chart and Filters Row -->
         <v-row class="mb-4">
             <v-col cols="12" md="6">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
+                <v-card elevation="2">
                     <v-card-item>
-                        <v-card-title class="text-white">Gráfico de Distribución por Cliente</v-card-title>
-                        <v-card-subtitle class="text-blue-grey-lighten-2">Cliente - Cant. - Monto
+                        <v-card-title>Gráfico de Distribución por Cliente</v-card-title>
+                        <v-card-subtitle>Cliente - Cant. - Monto
                             Total</v-card-subtitle>
                     </v-card-item>
                     <v-card-text>
@@ -103,24 +103,24 @@
             <v-col cols="12" md="6">
                 <v-row>
                     <v-col cols="12">
-                        <v-card class="bg-blue-grey-darken-4" elevation="2">
+                        <v-card elevation="2">
                             <v-card-item>
-                                <v-card-title class="text-white">Filtro por Cliente</v-card-title>
+                                <v-card-title>Filtro por Cliente</v-card-title>
                             </v-card-item>
                             <v-card-text>
                                 <v-select v-model="selectedClient" :items="clientOptions" label="Seleccionar Cliente"
-                                    variant="outlined" bg-color="blue-grey-darken-3" class="text-white"></v-select>
+                                    variant="outlined"></v-select>
                             </v-card-text>
                         </v-card>
                     </v-col>
                     <v-col cols="12">
-                        <v-card class="bg-blue-grey-darken-4" elevation="2">
+                        <v-card elevation="2">
                             <v-card-item>
-                                <v-card-title class="text-white">Periodo</v-card-title>
+                                <v-card-title>Periodo</v-card-title>
                             </v-card-item>
                             <v-card-text>
                                 <v-select v-model="selectedPeriod" :items="periodOptions" label="Seleccionar Periodo"
-                                    variant="outlined" bg-color="blue-grey-darken-3" class="text-white"></v-select>
+                                    variant="outlined"></v-select>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -131,27 +131,27 @@
         <!-- Purchase Summary -->
         <v-row class="mb-4">
             <v-col cols="12">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
-                    <v-card-title class="text-white">Resumen de Compras</v-card-title>
+                <v-card elevation="2">
+                    <v-card-title>Resumen de Compras</v-card-title>
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" md="4">
                                 <div class="text-center">
-                                    <div class="text-h6 text-white">Total Compras</div>
-                                    <div class="text-h4 text-blue-lighten-2">{{ filteredVentas.length }}</div>
+                                    <div class="text-h6">Total Compras</div>
+                                    <div class="text-h4 text-primary">{{ filteredVentas.length }}</div>
                                 </div>
                             </v-col>
                             <v-col cols="12" md="4">
                                 <div class="text-center">
-                                    <div class="text-h6 text-white">Monto Total Gastado</div>
-                                    <div class="text-h4 text-green-lighten-2">${{
+                                    <div class="text-h6">Monto Total Gastado</div>
+                                    <div class="text-h4 text-success">${{
                                         filteredStats.montoTotal.toLocaleString('es-CL') }}</div>
                                 </div>
                             </v-col>
                             <v-col cols="12" md="4">
                                 <div class="text-center">
-                                    <div class="text-h6 text-white">Promedio por Compra</div>
-                                    <div class="text-h4 text-orange-lighten-2">${{
+                                    <div class="text-h6">Promedio por Compra</div>
+                                    <div class="text-h4 text-warning">${{
                                         filteredStats.promedioCompra.toLocaleString('es-CL') }}</div>
                                 </div>
                             </v-col>
@@ -164,22 +164,21 @@
         <!-- Detailed Table -->
         <v-row>
             <v-col cols="12">
-                <v-card class="bg-blue-grey-darken-4" elevation="2">
-                    <v-card-title class="text-white">Detalle de Compras</v-card-title>
+                <v-card elevation="2">
+                    <v-card-title>Detalle de Compras</v-card-title>
                     <v-card-text>
-                        <v-data-table :headers="headers" :items="filteredVentas" :loading="loading"
-                            class="bg-blue-grey-darken-3" item-class="text-white">
+                        <v-data-table :headers="headers" :items="filteredVentas" :loading="loading">
                             <template v-slot:item.fecha="{ item }">
-                                <span class="text-white">{{ formatDate(item.fecha) }}</span>
+                                <span>{{ formatDate(item.fecha) }}</span>
                             </template>
                             <template v-slot:item.cliente="{ item }">
-                                <span class="text-white">{{ item.cliente || 'N/A' }}</span>
+                                <span>{{ item.cliente || 'N/A' }}</span>
                             </template>
                             <template v-slot:item.codigo="{ item }">
-                                <span class="text-white">{{ item.codigo }}</span>
+                                <span>{{ item.codigo }}</span>
                             </template>
                             <template v-slot:item.monto="{ item }">
-                                <span class="text-white">${{ item.monto.toLocaleString('es-CL') }}</span>
+                                <span>${{ item.monto.toLocaleString('es-CL') }}</span>
                             </template>
                         </v-data-table>
                     </v-card-text>
@@ -194,8 +193,11 @@ import { ref, computed, onMounted } from 'vue';
 import { useVentasStore } from '../stores/ventasStores';
 import { Pie } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale } from 'chart.js';
+import { useTheme } from 'vuetify';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale);
+
+const theme = useTheme();
 
 const ventasStore = useVentasStore();
 const loading = ref(true);
@@ -331,41 +333,46 @@ const chartData = computed(() => {
     };
 });
 
-const chartOptions = ref({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        title: {
-            display: true,
-            text: 'Distribución de Ventas por Cliente',
-            color: '#fff',
-            font: {
-                size: 16
-            }
-        },
-        legend: {
-            labels: {
-                color: '#fff',
+const chartOptions = computed(() => {
+    const isDark = theme.global.current.value.dark;
+    const textColor = isDark ? '#fff' : '#000';
+
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Distribución de Ventas por Cliente',
+                color: textColor,
                 font: {
-                    size: 12
+                    size: 16
                 }
-            }
-        },
-        tooltip: {
-            callbacks: {
-                label: function (context) {
-                    let label = context.label || '';
-                    if (label) {
-                        label += ': ';
+            },
+            legend: {
+                labels: {
+                    color: textColor,
+                    font: {
+                        size: 12
                     }
-                    if (context.parsed !== null) {
-                        label += new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(context.parsed);
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        let label = context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed !== null) {
+                            label += new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(context.parsed);
+                        }
+                        return label;
                     }
-                    return label;
                 }
             }
         }
-    }
+    };
 });
 
 const formatDate = (dateString) => {
