@@ -57,6 +57,14 @@
                     <p><strong>Cliente:</strong> {{ retiro.cliente }}</p>
                     <p><strong>Monto:</strong> ${{ retiro.monto.toLocaleString('es-CL') }}</p>
                     <p><strong>Código de Venta:</strong> {{ retiro.codigoVenta }}</p>
+                    <p><strong>Tipo de Venta:</strong>
+                        <v-chip :color="retiro.tipoVenta === 'live' ? 'purple' : 'blue'" size="x-small" variant="tonal"
+                            class="ml-2">
+                            <v-icon size="x-small" class="mr-1">{{ retiro.tipoVenta === 'live' ? 'mdi-video' :
+                                'mdi-calendar' }}</v-icon>
+                            {{ retiro.tipoVenta === 'live' ? 'Live' : 'Diaria' }}
+                        </v-chip>
+                    </p>
 
                     <v-form @submit.prevent="procesarRetiro" class="mt-4">
                         <v-combobox label="Retirado por" v-model="form.retiradoPor" :items="clientes.map(c => c.nombre)"

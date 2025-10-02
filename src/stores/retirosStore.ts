@@ -17,6 +17,7 @@ export interface Retiro {
     modoPago?: string;
     clienteNombre?: string;
     codigoVenta?: string;
+    tipoVenta?: string;
 }
 
 export const useRetirosStore = defineStore('retiros', {
@@ -53,13 +54,16 @@ export const useRetirosStore = defineStore('retiros', {
                     const cliente = clientesStore.clientes.find(c => c.id === data.clienteId);
 
                     const ventaDoc = await getDoc(doc(db, 'ventas', data.ventaId));
-                    const codigoVenta = ventaDoc.exists() ? ventaDoc.data().codigo : 'N/A';
+                    const ventaData = ventaDoc.exists() ? ventaDoc.data() : {};
+                    const codigoVenta = ventaData.codigo || 'N/A';
+                    const tipoVenta = ventaData.tipo || 'N/A';
 
                     retirosTemp.push({
                         id: docSnap.id,
                         ...data,
                         clienteNombre: cliente ? cliente.nombre : 'Desconocido',
                         codigoVenta: codigoVenta,
+                        tipoVenta: tipoVenta,
                     });
                 }
                 this.retiros = retirosTemp;

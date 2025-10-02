@@ -24,6 +24,7 @@
         { title: 'Fecha Venta', key: 'fecha' },
         { title: 'Cliente', key: 'cliente' },
         { title: 'Código Venta', key: 'codigoVenta' },
+        { title: 'Tipo Venta', key: 'tipoVenta' },
         { title: 'Monto Venta', key: 'monto' },
         { title: 'Estado', key: 'estado' },
         { title: 'Retirado Por', key: 'retiradoPor' },
@@ -108,6 +109,13 @@
                             hour: '2-digit',
                             minute: '2-digit'
                         }) : 'Sin Fecha' }}
+                    </template>
+                    <template v-slot:item.tipoVenta="{ item }">
+                        <v-chip :color="item.tipoVenta === 'live' ? 'purple' : 'blue'" size="x-small" variant="tonal">
+                            <v-icon size="x-small" class="mr-1">{{ item.tipoVenta === 'live' ? 'mdi-video' :
+                                'mdi-calendar' }}</v-icon>
+                            {{ item.tipoVenta === 'live' ? 'Live' : 'Diaria' }}
+                        </v-chip>
                     </template>
                     <template v-slot:item.monto="{ item }">
                         ${{ item.monto.toLocaleString('es-CL') }}

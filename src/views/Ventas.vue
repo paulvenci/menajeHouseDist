@@ -460,7 +460,7 @@
     import { useClientesStore } from '../stores/clientesStore'
     // import { useRetirosStore } from '../stores/retirosStore';
     import { db } from '../firebase'
-    import { collection, addDoc, getDocs, updateDoc } from 'firebase/firestore'
+    import { collection, addDoc, getDocs, updateDoc, doc } from 'firebase/firestore'
     import draggable from 'vuedraggable'
 
     // Interfaces
@@ -801,7 +801,7 @@ Equipo de Menaje House`
         resumenVentas.value = []
     }
 
-    // Guardar ventas en Firestore
+    // Guardar ventas en Firestore con UPSERT (actualizar existentes o crear nuevas)
     async function guardarVentas() {
         registrando.value = true;
         try {
@@ -809,46 +809,120 @@ Equipo de Menaje House`
                 // Condición para omitir ventas live sin cliente
                 if (venta.tipo === 'live' && (!venta.cliente || venta.cliente.trim() === '')) {
                     console.log('Venta live sin cliente, omitiendo guardar:', venta);
-                    continue; // Saltar a la siguiente iteración del bucle
+                    continue;
                 }
 
-                // Guarda la venta en la colección 'ventas' y obtiene el ID
-                const ventaDocRef = await addDoc(collection(db, "ventas"), {
+                const ventaData = {
                     codigo: venta.codigo,
                     monto: venta.monto,
                     cliente: venta.cliente || "Cliente desconocido",
                     tipo: venta.tipo || 'diaria',
                     fecha: venta.fecha || new Date().toISOString(),
-                    modoPago: venta.modoPago || null,
-                    retiroId: null // Se inicializa como nulo
-                });
+                    modoPago: venta.modoPago || null
+                };
 
-                // Si el checkbox de retiro está marcado, crea un retiro pendiente
-                if (generarRetiro.value) {
+                let ventaDocRef: any;
+                const esVentaNueva = !venta.id; // Verificar si es venta nueva ANTES de asignar ID
+
+                // Si la venta tiene ID, significa que ya existe en Firestore
+                if (venta.id) {
+                    // ACTUALIZAR venta existente
+                    const docRef = doc(db, "ventas", venta.id);
+                    await updateDoc(docRef, ventaData);
+                    ventaDocRef = docRef;
+                    console.log(`✏️ Venta actualizada: ${venta.id}`);
+                } else {
+                    // CREAR nueva venta
+                    ventaDocRef = await addDoc(collection(db, "ventas"), {
+                        ...ventaData,
+                        retiroId: null
+                    });
+                    // Actualizar el ID en el array local para futuras actualizaciones
+                    venta.id = ventaDocRef.id;
+                    console.log(`✅ Venta nueva creada: ${ventaDocRef.id}`);
+                }
+
+                // Si el checkbox de retiro está marcado y es una venta NUEVA
+                if (generarRetiro.value && esVentaNueva) {
+                    // Buscar el ID del cliente si existe
+                    let clienteId = "Cliente desconocido";
+                    if (venta.cliente && venta.cliente !== "Cliente desconocido") {
+                        const clienteEncontrado = clientesStore.clientes.find(c => c.nombre === venta.cliente);
+                        if (clienteEncontrado) {
+                            clienteId = clienteEncontrado.id;
+                        }
+                    }
+
                     const retiroData = {
-                        ventaId: ventaDocRef.id, // Enlace a la venta
-                        cliente: venta.cliente || "Cliente desconocido",
+                        ventaId: ventaDocRef.id,
+                        clienteId: clienteId,
                         monto: venta.monto,
                         estado: 'pendiente',
                         fecha: new Date().toISOString()
                     };
 
-                    // Crea el documento en la colección 'retiros'
                     const retiroDocRef = await addDoc(collection(db, "retiros"), retiroData);
-
-                    // Actualiza el documento de venta con el ID del retiro recién creado
                     await updateDoc(ventaDocRef, { retiroId: retiroDocRef.id });
+                    console.log(`✅ Retiro creado para venta: ${ventaDocRef.id}`);
                 }
             }
-            alert("✅ Ventas guardadas en Firestore");
+            alert("✅ Ventas guardadas/actualizadas en Firestore");
         } catch (err) {
             console.error("Error guardando ventas:", err);
             alert("❌ Ocurrió un error al guardar ventas");
         } finally {
             registrando.value = false;
-            limpiarVentas();
+            // NO limpiamos las ventas para mantenerlas visibles
+            // limpiarVentas();
         }
     }
+    // async function guardarVentas() {
+    //     registrando.value = true;
+    //     try {
+    //         for (const venta of ventasAgregadas.value) {
+    //             // Condición para omitir ventas live sin cliente
+    //             if (venta.tipo === 'live' && (!venta.cliente || venta.cliente.trim() === '')) {
+    //                 console.log('Venta live sin cliente, omitiendo guardar:', venta);
+    //                 continue; // Saltar a la siguiente iteración del bucle
+    //             }
+
+    //             // Guarda la venta en la colección 'ventas' y obtiene el ID
+    //             const ventaDocRef = await addDoc(collection(db, "ventas"), {
+    //                 codigo: venta.codigo,
+    //                 monto: venta.monto,
+    //                 cliente: venta.cliente || "Cliente desconocido",
+    //                 tipo: venta.tipo || 'diaria',
+    //                 fecha: venta.fecha || new Date().toISOString(),
+    //                 modoPago: venta.modoPago || null,
+    //                 retiroId: null // Se inicializa como nulo
+    //             });
+
+    //             // Si el checkbox de retiro está marcado, crea un retiro pendiente
+    //             if (generarRetiro.value) {
+    //                 const retiroData = {
+    //                     ventaId: ventaDocRef.id, // Enlace a la venta
+    //                     cliente: venta.cliente || "Cliente desconocido",
+    //                     monto: venta.monto,
+    //                     estado: 'pendiente',
+    //                     fecha: new Date().toISOString()
+    //                 };
+
+    //                 // Crea el documento en la colección 'retiros'
+    //                 const retiroDocRef = await addDoc(collection(db, "retiros"), retiroData);
+
+    //                 // Actualiza el documento de venta con el ID del retiro recién creado
+    //                 await updateDoc(ventaDocRef, { retiroId: retiroDocRef.id });
+    //             }
+    //         }
+    //         alert("✅ Ventas guardadas en Firestore");
+    //     } catch (err) {
+    //         console.error("Error guardando ventas:", err);
+    //         alert("❌ Ocurrió un error al guardar ventas");
+    //     } finally {
+    //         registrando.value = false;
+    //         limpiarVentas();
+    //     }
+    // }
 
     async function abrirVentasFiltradas() {
         try {
