@@ -242,6 +242,13 @@
                                     <v-list-item-title class="font-weight-medium mb-1">
                                         <div class="d-flex align-center justify-space-between">
                                             <span>{{ venta.cliente || 'Cliente desconocido' }}</span>
+                                            <v-chip :color="venta.guardada ? 'success' : 'warning'" size="x-small"
+                                                variant="tonal" class="ml-2">
+                                                <v-icon size="x-small" class="mr-1">
+                                                    {{ venta.guardada ? 'mdi-cloud-check' : 'mdi-cloud-upload' }}
+                                                </v-icon>
+                                                {{ venta.guardada ? 'Guardada' : 'Sin guardar' }}
+                                            </v-chip>
                                         </div>
                                     </v-list-item-title>
 
@@ -472,6 +479,7 @@
         tipo?: string
         fecha?: string
         modoPago?: string
+        guardada?: boolean
     }
 
     interface Resumen {
@@ -698,7 +706,8 @@
             ventasAgregadas.value.unshift({
                 ...nuevaVenta,
                 tipo: tipoSeleccionado.value,
-                fecha: new Date().toISOString()
+                fecha: new Date().toISOString(),
+                guardada: false
             })
             nuevaVenta.codigo = ''
             nuevaVenta.monto = null
@@ -830,6 +839,7 @@ Equipo de Menaje House`
                     const docRef = doc(db, "ventas", venta.id);
                     await updateDoc(docRef, ventaData);
                     ventaDocRef = docRef;
+                    venta.guardada = true; // Marcar como guardada
                     console.log(`✏️ Venta actualizada: ${venta.id}`);
                 } else {
                     // CREAR nueva venta
@@ -839,6 +849,7 @@ Equipo de Menaje House`
                     });
                     // Actualizar el ID en el array local para futuras actualizaciones
                     venta.id = ventaDocRef.id;
+                    venta.guardada = true; // Marcar como guardada
                     console.log(`✅ Venta nueva creada: ${ventaDocRef.id}`);
                 }
 
@@ -931,7 +942,7 @@ Equipo de Menaje House`
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Venta
                 let mostrar = true
-                const ventaConId = { ...data, id: doc.id };
+                const ventaConId = { ...data, id: doc.id, guardada: true };
 
                 // Si hay fecha seleccionada, cargar TODAS las ventas de ese día
                 if (filtroFecha.value) {
