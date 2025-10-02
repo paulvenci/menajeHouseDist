@@ -5,6 +5,10 @@ import path from 'path'
 
 
 export default defineConfig({
+  base: './',
+  build: {
+    outDir: 'docs',
+  },
   plugins: [
     vue(),
     vuetify({ autoImport: true }), // habilita Vuetify
