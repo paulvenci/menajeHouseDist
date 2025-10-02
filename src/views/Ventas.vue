@@ -405,6 +405,15 @@
             </template>
         </v-snackbar>
 
+        <v-snackbar v-model="snackbarGuardado" :timeout="2000"
+            :color="mensajeSnackbar.includes('✅') ? 'success' : 'error'" location="top" class="text-none">
+            <div class="d-flex align-center">
+                <v-icon class="mr-3">{{ mensajeSnackbar.includes('✅') ? 'mdi-check-circle' : 'mdi-alert-circle'
+                }}</v-icon>
+                <span>{{ mensajeSnackbar }}</span>
+            </div>
+        </v-snackbar>
+
         <v-dialog v-model="dialog" max-width="500" persistent>
             <v-card>
                 <v-card-title class="d-flex align-center pa-4 pa-md-6 pb-4">
@@ -480,6 +489,7 @@
         fecha?: string
         modoPago?: string
         guardada?: boolean
+        estadoPago?: string
     }
 
     interface Resumen {
@@ -515,6 +525,8 @@
         telefono: ''
     })
     const snackbar = ref(false)
+    const snackbarGuardado = ref(false)
+    const mensajeSnackbar = ref('')
     const tipoSeleccionado = ref('diaria')
     const dialogFiltro = ref(false)
     const filtroFecha = ref('')
@@ -597,6 +609,7 @@
     onMounted(() => {
         clientesStore.cargarClientes()
         cargarOrdenCampos()
+        cargarVentasDelDia() // Cargar automáticamente las ventas del día actual
     })
 
     // Funciones de utilidad
@@ -815,11 +828,8 @@ Equipo de Menaje House`
         registrando.value = true;
         try {
             for (const venta of ventasAgregadas.value) {
-                // Condición para omitir ventas live sin cliente
-                if (venta.tipo === 'live' && (!venta.cliente || venta.cliente.trim() === '')) {
-                    console.log('Venta live sin cliente, omitiendo guardar:', venta);
-                    continue;
-                }
+                // Determinar el estado de pago basado en si tiene modo de pago
+                const estadoPago = venta.modoPago ? 'pagado' : 'pendiente';
 
                 const ventaData = {
                     codigo: venta.codigo,
@@ -827,7 +837,8 @@ Equipo de Menaje House`
                     cliente: venta.cliente || "Cliente desconocido",
                     tipo: venta.tipo || 'diaria',
                     fecha: venta.fecha || new Date().toISOString(),
-                    modoPago: venta.modoPago || null
+                    modoPago: venta.modoPago || null,
+                    estadoPago: estadoPago
                 };
 
                 let ventaDocRef: any;
@@ -877,10 +888,12 @@ Equipo de Menaje House`
                     console.log(`✅ Retiro creado para venta: ${ventaDocRef.id}`);
                 }
             }
-            alert("✅ Ventas guardadas/actualizadas en Firestore");
+            mensajeSnackbar.value = "✅ Ventas guardadas/actualizadas correctamente";
+            snackbarGuardado.value = true;
         } catch (err) {
             console.error("Error guardando ventas:", err);
-            alert("❌ Ocurrió un error al guardar ventas");
+            mensajeSnackbar.value = "❌ Ocurrió un error al guardar ventas";
+            snackbarGuardado.value = true;
         } finally {
             registrando.value = false;
             // NO limpiamos las ventas para mantenerlas visibles
@@ -968,6 +981,36 @@ Equipo de Menaje House`
         } catch (err) {
             console.error("Error abriendo ventas:", err)
             alert("❌ Error cargando ventas")
+        }
+    }
+
+    // Función para cargar automáticamente las ventas del día actual
+    async function cargarVentasDelDia() {
+        try {
+            const hoy = new Date()
+            const hoyStr = hoy.toLocaleDateString('es-CL')
+
+            const querySnapshot = await getDocs(collection(db, "ventas"))
+            const ventasDelDia: Venta[] = []
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data() as Venta
+                const ventaFecha = new Date(data.fecha || '').toLocaleDateString('es-CL')
+
+                // Solo cargar ventas del día actual
+                if (ventaFecha === hoyStr) {
+                    ventasDelDia.push({
+                        ...data,
+                        id: doc.id,
+                        guardada: true
+                    })
+                }
+            })
+
+            ventasAgregadas.value = ventasDelDia
+            console.log(`✅ Cargadas ${ventasDelDia.length} ventas del día actual`)
+        } catch (err) {
+            console.error("Error cargando ventas del día:", err)
         }
     }
 
